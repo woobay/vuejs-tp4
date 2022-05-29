@@ -1,7 +1,7 @@
 <template> 
   <main>
     <div class="container-fluid">
-      <button class="btn btn-secondary m-1" :v-model="search" v-for="tag in tags">{{tag}}</button>
+      <button class="btn btn-secondary m-1" v-on:change="filteredTags" :v-model="search" v-for="tag in tags">{{tag}}</button>
     </div>
     <!-- <Button :info="this.tags"/> -->
     <div v-for="(site, index) in sites" :key="index" :id="index" class="container-fluid border p-3 m-3">
@@ -9,7 +9,7 @@
       <h4 v-else>{{site.nom}}</h4>
       <p>{{site.description}}</p>
       <button class="btn btn-secondary m-1" :v-model="tags" v-for="but in site.tags">{{but}}</button><br>
-      <button @click.native="deleteSite(index)" class="btn btn-danger m-1">Delete</button>
+      <button @click.native="deleteSite(site.id)" class="btn btn-danger m-1">Delete</button>
     </div>
   </main>
 </template>
@@ -23,24 +23,39 @@ import Button from "../components/Buttons.vue"
       return {
         sites: [],
         tags: [],
-        search: ""
+        search: "",
+        currentState: false
       }
     }, 
      methods: {
       async deleteSite(id) {
+        console.log("Here")
        await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites/${id}.json`, {
          method: "DELETE"
        })
-        
+        this.loadSites()
+        this.loadTags()
       },
-    },
-    async created() {
-     let arr = []
-      let result = await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites.json`)
-      let data = await result.json()
+      async loadSites() {
+        let arr = []
+        let result = await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites.json`)
+        let data = await result.json()
+        for(let i in data) {
+          data[i].id = i
+          arr.push(data[i])
+        }
+        let reverse = [...arr].reverse()
+        this.sites = reverse
 
-      let keys = Object.keys(data)
-      for (let i = 0; i < keys.length; i++) {
+
+
+      },
+      async loadTags() {
+        let result = await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites.json`)
+        let data = await result.json()
+        let arr = []
+        let keys = Object.keys(data)
+        for (let i = 0; i < keys.length; i++) {
         let k = keys[i];
         let tag = data[k].tags
         arr.push(tag)
@@ -48,14 +63,25 @@ import Button from "../components/Buttons.vue"
       let merge = [].concat.apply([], arr)
       let unique = [...new Set(merge)]
       this.tags = unique
-      this.sites = data
+
+      }
+    },
+    async mounted() {
+     this.loadSites()
+     this.loadTags()
+    
     },
     computed: {
-      filteredSites() {
-        // console.log(this.sites)
-        // return this.sites.filter((site) => {
-        //   return site.tags.match(this.search)
-        // })
+      filteredsites() {
+        
+      },
+      filteredTags() {
+        
+        console.log("click")
+        return this.tags.filter((tag) => {
+          return tag.match(this.search)
+        })
+        
       }
         
       }
