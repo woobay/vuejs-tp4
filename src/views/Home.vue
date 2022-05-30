@@ -5,7 +5,7 @@
     </div>
     <!-- <Button :info="this.tags"/> -->
     <div v-if="current.length === 0">
-      <div v-for="(site, index) in sites" :key="index" :id="index" class="container-fluid border p-3 m-3">
+      <div v-for="(site, index) in sites" :key="index + 1" :id="index +1" class="container-fluid border p-3 m-3">
         <h4 class="m-1" v-if="site.url"><a :href="site.url">{{site.nom}}</a></h4>
         <h4 v-else>{{site.nom}}</h4>
         <p class="m-1">{{site.description}}</p>
@@ -22,33 +22,11 @@
         <button @click.native="deleteSite(site.id)" class="btn btn-danger m-1">Delete</button>
       </div>
     </div>
-
-    <div class="modal" tabindex="-1" id="reg-modal" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
   </main>
 </template>
 
 
 <script>
-import { KeepAlive } from "vue"
 import Button from "../components/Buttons.vue"
   export default {
     components: {Button},
@@ -64,11 +42,14 @@ import Button from "../components/Buttons.vue"
     }, 
      methods: {
       async deleteSite(id) {
-       await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites/${id}.json`, {
-         method: "DELETE"
-       })
-        this.loadSites()
-        this.loadTags()
+        if (confirm("Voulez vous vraiment supprimer ce site?")) {
+          await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites/${id}.json`, {
+            method: "DELETE"
+          })
+          this.current = []
+           this.loadSites()
+           this.loadTags()
+        }
       },
       async loadSites() {
         let arr = []
@@ -94,7 +75,6 @@ import Button from "../components/Buttons.vue"
       let merge = [].concat.apply([], arr)
       let unique = [...new Set(merge)]
       this.tags = unique
-
       },
         filteredTags(tag) {
           this.current = this.sites
@@ -116,14 +96,17 @@ import Button from "../components/Buttons.vue"
       
       }
     },
-    async mounted() {
+    mounted() {
      this.loadSites()
      this.loadTags()
     
     },
     computed: {
  
-    }
+    },
+    // updated: {
+      
+    // }
   }
 
 
