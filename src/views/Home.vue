@@ -1,11 +1,11 @@
 <template> 
   <main>
     <div class="container-fluid">
-      <button class="btn btn-primary m-1" :class="{active:isActive === i}" @click="filteredTags(tag); toggle(i);"  v-for="(tag, i) in tags" :key="i">{{tag}}</button>
+      <button class="btn btn-primary m-1" :class="{active:isActive === i}" @click="filteredTags(tag, i)"  v-for="(tag, i) in tags" :key="i">{{tag}}</button>
     </div>
     <!-- <Button :info="this.tags"/> -->
     <div v-if="current.length === 0">
-      <div v-for="(site, index) in sites" :key="index + 1" :id="index +1" class="container-fluid border p-3 m-3">
+      <div v-for="(site, index) in sites" :key="index" :id="index" class="container-fluid border p-3 m-3">
         <h4 class="m-1" v-if="site.url"><a :href="site.url">{{site.nom}}</a></h4>
         <h4 v-else>{{site.nom}}</h4>
         <p class="m-1">{{site.description}}</p>
@@ -27,9 +27,7 @@
 
 
 <script>
-import Button from "../components/Buttons.vue"
   export default {
-    components: {Button},
     data() {
       return {
         sites: [],
@@ -37,6 +35,7 @@ import Button from "../components/Buttons.vue"
         current: [],
         filteredSites: [],
         search: "",
+        lastIndex: "",
         isActive: null
       }
     }, 
@@ -74,27 +73,27 @@ import Button from "../components/Buttons.vue"
       }
       let merge = [].concat.apply([], arr)
       let unique = [...new Set(merge)]
-      this.tags = unique
+      let trimed = unique.filter(Boolean)
+      this.tags = trimed
       },
-        filteredTags(tag) {
-          this.current = this.sites
-          let items = this.current.filter(item => {
-          return item.tags.includes(tag)
-          })
-        this.current = items
+        filteredTags(tag, i ) { 
+          if (i == this.isActive) {
+            console.log("i est lastindex")
+            this.current = this.sites
+            this.isActive = null
+          } else if (i != this.isActive) {
+            console.log("i != active")
+            this.isActive = i
+            this.current = this.sites
+            let items = this.current.filter(item => {
+            return item.tags.includes(tag)
+            }) 
+          this.current = items
+          } 
+         this.lastIndex = i 
+         
+          
       },
-      toggle(i) {
-        if(!!this.isActive) {
-          this.isActive = null
-          this.current = []
-          console.log("Here")
-          console.log(i)
-        } else {
-          console.log("Also here")
-          this.isActive = i
-        }
-      
-      }
     },
     mounted() {
      this.loadSites()
@@ -103,10 +102,7 @@ import Button from "../components/Buttons.vue"
     },
     computed: {
  
-    },
-    // updated: {
-      
-    // }
+    }
   }
 
 

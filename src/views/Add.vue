@@ -9,7 +9,7 @@
             <label>Description:</label>
             <textarea class="form-control" type="text" v-model="desc"></textarea>
             <label>Tags:</label>
-            <input class="form-control" type="text" v-model="tags"><br>
+            <input class="form-control" type="text" v-model.trim="tags"><br>
             <button type="submit" class="btn btn-success">Ajouter</button>
             </form>
     </div>
