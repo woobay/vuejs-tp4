@@ -6,7 +6,7 @@
     <!-- <Button :info="this.tags"/> -->
     <div v-if="current.length === 0">
       <div v-for="(site, index) in sites" :key="index" :id="index" class="container-fluid border p-3 m-3">
-        <h4 class="m-1" v-if="site.url"><a :href="site.url">{{site.nom}}</a></h4>
+        <h4 class="m-1" v-if="site.url"><a target="_blank" :href="site.url">{{site.nom}}</a></h4>
         <h4 v-else>{{site.nom}}</h4>
         <p class="m-1">{{site.description}}</p>
         <button class="btn btn-primary m-1" v-for="but in site.tags">{{but}}</button><br>
@@ -99,9 +99,6 @@
      this.loadSites()
      this.loadTags()
     
-    },
-    computed: {
- 
     }
   }
 

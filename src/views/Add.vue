@@ -2,8 +2,11 @@
     <div class="container-fluid">
         <h3>Ajouter un site</h3>
         <form @submit.prevent="submitData" class="form-group ">
-            <label>Nom:</label>
-            <input class="form-control" type="text" v-model="nom">
+            <div :class="{invalid: userNameValidity}">
+                <label>Nom:</label>
+                <input class="form-control" type="text" v-model="nom">
+                 <p class="error" v-if="userNameValidity">Veuillez saisir un nom</p>
+            </div>
             <label>URL:</label>
             <input class="form-control" type="text" v-model="url">
             <label>Description:</label>
@@ -23,12 +26,19 @@
                 nom: "",
                 url: "",
                 desc: "",
-                tags: ""
+                tags: "",
+                userNameValidity: false,
+                formIsValid: true
 
             }
         }, 
         methods: {
             async submitData() {
+                this.validate(); 
+  
+            if (!this.formIsValid) {
+                return;
+            }
                 let array = this.tags.split(" ")
                 let result = await fetch(`https://api---vuejs-default-rtdb.firebaseio.com/sites.json`, {
                     method: "POST", 
@@ -43,6 +53,15 @@
                         tags: array})
                 })
                 this.$router.push("/")
+            }, 
+            validate() {
+                this.formIsValid = true
+                this.userNameValidity = false;
+
+                if (this.nom.length === 0 || this.nom.length > 250) {
+                    this.userNameValidity = true;
+                    this.formIsValid = false;
+                 }
             }
         }
     }
@@ -55,5 +74,9 @@
 <style>
     form {
         width: 30%
+    }
+
+    .error {
+        color: red
     }
 </style>
